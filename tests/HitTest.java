@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 public class HitTest {
    @Test
     public void testHits() {
-       Team team = new Team();
+       Team team = new Team("Test Team");
        Player player = new Player(0.250, team);
        int outs = 0;
        int singles = 0;

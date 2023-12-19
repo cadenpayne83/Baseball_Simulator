@@ -10,7 +10,7 @@ public class TeamTest {
     @Test
     public void constructTeam() {
         Random battingAverageDeterminer = new Random();
-        Team team = new Team();
+        Team team = new Team("Test Team");
         team.constructTeam();
 
         System.out.println("Line up has " + team.lineUp.size() + " players!");

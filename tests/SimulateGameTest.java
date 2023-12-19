@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 public class SimulateGameTest {
     @Test
     public void simulateGame() {
-//        BaseballSimulator.simulateGame();
+        Team homeTeam = new Team("Home Team");
+        Team awayTeam = new Team("Away Team");
+        BaseballSimulator.simulateGame(homeTeam, awayTeam);
     }
 }

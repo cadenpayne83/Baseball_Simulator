@@ -9,7 +9,7 @@ public class GameState {
     private int awayTeamRuns;
     private boolean isPlaying;
 
-    public GameState(int inning, Team homeTeam, Team awayTeam, Player currentPitcher, Player currentBatter) {
+    public GameState(int inning, int outs, Team homeTeam, Team awayTeam, Player currentPitcher, Player currentBatter) {
         this.inning = inning;
         this.outs = 0;
         this.currentPitcher = currentPitcher;
@@ -52,8 +52,10 @@ public class GameState {
         return awayTeam;
     }
 
-    public Player getCurrentPitcher() {
-        return currentPitcher;
+    // Returns the current player as an instance of a CurrentPlayer.
+    public CurrentPitcher getCurrentPitcher() {
+        Player pitcher = currentPitcher;
+        return new CurrentPitcher(0);
     }
 
     public void setCurrentPitcher(Player currentPitcher) {
@@ -73,5 +75,9 @@ public class GameState {
     }
     public void endGame() {
         this.isPlaying = false;
+    }
+
+    public void resetOuts() {
+        this.outs = 0;
     }
 }
