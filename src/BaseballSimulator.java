@@ -7,14 +7,30 @@ public class BaseballSimulator {
         gameState = new GameState(1, 0, homeTeam, awayTeam, null, null);
 
         while (gameState.isPlaying()) {
-            for (int i = 0; i < 9; i++) {
-                simulateInning();
-            }
+            simulateInning();
         }
     }
 
     public static void simulateInning() {
-        System.out.println("An inning has begun!");
+        int inning = gameState.getInning();
+        boolean isTopOfInning = gameState.getIsTopOfInning();
+        if (isTopOfInning) {
+            System.out.print("Top of the ");
+        } else {
+            System.out.print("Bottom of the ");
+        }
+
+        // This deals with 1st, 2nd, 3rd, 4th and so on
+        if (inning == 1) {
+            System.out.println("1st!");
+        } else if (inning == 2) {
+            System.out.println("2nd!");
+        } else if (inning == 3) {
+            System.out.println("3rd!");
+        } else {
+            System.out.println(inning + "th!");
+        }
+
         System.out.println();
         while (gameState.getOuts() < 3) {
             simulateAtBat();
@@ -27,14 +43,16 @@ public class BaseballSimulator {
 
     public static void simulateAtBat() {
         CurrentPitcher currentPitcher = gameState.getCurrentPitcher();
-        Player currentBatter = gameState.getCurrentBatter();
+        CurrentBatter currentBatter = gameState.getCurrentBatter();
         int pitchesThrownThisAtBat = 0;
         int strikes = 0;
         int balls = 0;
         while ((strikes < 3) && (balls < 4)) {
             boolean isStrike = currentPitcher.throwPitch();
 
+            // At this point, batter only swings at strikes
             if (isStrike) {
+                Hit hit = currentBatter.swing();
                 strikes += 1;
                 System.out.println("Strike " + strikes + "!");
             } else {

@@ -1,5 +1,7 @@
 public class GameState {
     private int inning;
+
+    private boolean topOfInning;
     private int outs;
     private Player currentPitcher;
     private Player currentBatter;
@@ -19,17 +21,25 @@ public class GameState {
         this.awayTeam = awayTeam;
         this.awayTeamRuns = 0;
         this.isPlaying = true;
+        this.topOfInning = true;
     }
 
     public int getInning() {
         return inning;
     }
 
+    public boolean getIsTopOfInning() {
+        return topOfInning;
+    }
+
     public void advanceInning() {
-        if (this.inning == 9) {
+        if (this.inning == 9 && !this.topOfInning) {
             this.isPlaying = false;
+        } else if (this.getIsTopOfInning()){
+            topOfInning = !topOfInning;
         } else {
-            this.inning += 1;
+            topOfInning = !topOfInning;
+            inning += 1;
         }
     }
 
@@ -39,9 +49,6 @@ public class GameState {
 
     public void advanceOuts() {
         this.outs += 1;
-        if (this.outs == 3) {
-            advanceInning();
-        }
     }
 
     public Team getHomeTeam() {
@@ -62,8 +69,9 @@ public class GameState {
         this.currentPitcher = currentPitcher;
     }
 
-    public Player getCurrentBatter() {
-        return currentBatter;
+    public CurrentBatter getCurrentBatter() {
+        Player batter = currentBatter;
+        return new CurrentBatter(batter, batter.getBattingAverage());
     }
 
     public void setCurrentBatter(Player currentBatter) {
@@ -80,4 +88,6 @@ public class GameState {
     public void resetOuts() {
         this.outs = 0;
     }
+
+
 }

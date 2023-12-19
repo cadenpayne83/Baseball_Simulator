@@ -28,4 +28,8 @@ public class Player {
         System.out.println("Player is out.");
         return 0;
     }
+
+    public double getBattingAverage() {
+        return this.battingAverage;
+    }
 }
