@@ -1,13 +1,15 @@
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Random;
-public class Player {
+public class Player implements Comparable<Player> {
     double battingAverage;
+    double era;
     Team team;
 
-    public Player(double avg, Team team) {
+    public Player(double avg, double era, Team team) {
         this.battingAverage = avg;
         this.team = team;
+        this.era = era;
     }
 
     /* The return value represents the number of bases awarded to the player.
@@ -31,5 +33,20 @@ public class Player {
 
     public double getBattingAverage() {
         return this.battingAverage;
+    }
+
+    public double getEra() {
+        return era;
+    }
+
+    // Implement the compareTo method for sorting
+    @Override
+    public int compareTo(Player otherPlayer) {
+        // Sort in descending order based on the 'era' variable
+        return Double.compare(this.getEra(), otherPlayer.getEra());
+    }
+
+    public Team getTeam() {
+        return this.team;
     }
 }

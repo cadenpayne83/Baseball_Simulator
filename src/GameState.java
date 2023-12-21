@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class GameState {
     private int inning;
 
@@ -10,18 +12,30 @@ public class GameState {
     private Team awayTeam;
     private int awayTeamRuns;
     private boolean isPlaying;
+    private BasePath basePath;
 
     public GameState(int inning, int outs, Team homeTeam, Team awayTeam, Player currentPitcher, Player currentBatter) {
         this.inning = inning;
         this.outs = 0;
-        this.currentPitcher = currentPitcher;
-        this.currentBatter = currentBatter;
         this.homeTeam = homeTeam;
         this.homeTeamRuns = 0;
         this.awayTeam = awayTeam;
         this.awayTeamRuns = 0;
         this.isPlaying = true;
         this.topOfInning = true;
+
+        // Construct teams in order to grab players.
+        this.homeTeam.constructTeam();
+        this.awayTeam.constructTeam();
+
+        // Grab current pitcher and current batter. When
+        // a baseball game starts, the visiting team bats first,
+        // while the home team pitches/fields first.
+        this.currentPitcher = homeTeam.getFirstPitcher();
+        this.currentBatter = awayTeam.getFirstBatter();
+
+        // Construct base path
+        this.basePath = new BasePath();
     }
 
     public int getInning() {
@@ -62,7 +76,7 @@ public class GameState {
     // Returns the current player as an instance of a CurrentPlayer.
     public CurrentPitcher getCurrentPitcher() {
         Player pitcher = currentPitcher;
-        return new CurrentPitcher(0);
+        return new CurrentPitcher(pitcher, 0);
     }
 
     public void setCurrentPitcher(Player currentPitcher) {
@@ -71,7 +85,8 @@ public class GameState {
 
     public CurrentBatter getCurrentBatter() {
         Player batter = currentBatter;
-        return new CurrentBatter(batter, batter.getBattingAverage());
+        CurrentTeam associatedCurrentTeam = new CurrentTeam(batter.getTeam());
+        return new CurrentBatter(batter, batter.getBattingAverage(), associatedCurrentTeam);
     }
 
     public void setCurrentBatter(Player currentBatter) {
@@ -87,6 +102,40 @@ public class GameState {
 
     public void resetOuts() {
         this.outs = 0;
+    }
+
+    public void putOnBase(int baseNumber, Player player) {
+        if (baseNumber == 1) {
+            basePath.firstBase.addPlayer(player);
+        } else if (baseNumber == 2) {
+            basePath.secondBase.addPlayer(player);
+        } else if (baseNumber == 3) {
+            basePath.thirdBase.addPlayer(player);
+        }
+    }
+    public void incrementScore(int increment) {
+        this.homeTeamRuns += increment;
+    }
+
+    public int getHomeTeamRuns() {
+        return this.homeTeamRuns;
+    }
+
+    public int getAwayTeamRuns() {
+        return this.awayTeamRuns;
+    }
+
+    private BasePath getBasePath() {
+        return this.basePath;
+    }
+    public void walkBatter() {
+        LinkedList<BasePath.Base> basePath = getBasePath().getBasePathLinkedList();
+        for (int i = 0; i < 3; i++) {
+            BasePath.Base base = basePath.get(i);
+            if (base.isOccupied()) {
+//                for
+            }
+        }
     }
 
 

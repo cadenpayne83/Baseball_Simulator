@@ -42,6 +42,7 @@ public class BaseballSimulator {
     }
 
     public static void simulateAtBat() {
+        System.out.println("Batter Up!");
         CurrentPitcher currentPitcher = gameState.getCurrentPitcher();
         CurrentBatter currentBatter = gameState.getCurrentBatter();
         int pitchesThrownThisAtBat = 0;
@@ -52,7 +53,21 @@ public class BaseballSimulator {
 
             // At this point, batter only swings at strikes
             if (isStrike) {
+                // For now, it will always be a hit, never a swing or miss.
                 Hit hit = currentBatter.swing();
+                int bases = hit.getBases();
+                if (bases > 0 && bases < 4) {
+                    currentBatter.putOnBase(hit.getBases());
+                } else if (bases == 4) {
+                    CurrentTeam battersTeam = currentBatter.getAssociatedCurrentTeam();
+
+                    // change to account for runners on base
+                    gameState.incrementScore(1);
+                    System.out.println("Home run! Score is " + gameState.getHomeTeamRuns() + " to " + gameState.getAwayTeamRuns());
+                    // next batter now
+                    System.out.println();
+                    return;
+                }
                 strikes += 1;
                 System.out.println("Strike " + strikes + "!");
             } else {
