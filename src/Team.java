@@ -4,22 +4,23 @@ import java.util.List;
 import java.util.Random;
 
 public class Team {
-    List<Player> lineUp = new ArrayList<>();
+    List<Player> hittingRoster = new ArrayList<>();
 
     List<Player> pitchingRoster = new ArrayList<>();
     private final String name;
 
     public Team(String name) {
         this.name = name;
+        constructHittingRoster();
     }
 
-    public void constructTeam() {
+    public void constructHittingRoster() {
         // Construct line up.
         Random battingAverageDeterminer = new Random();
         for (int i = 0; i < 9; i++) {
-            double battingAverage = battingAverageDeterminer.nextDouble(0.100, 0.500);
+            double battingAverage = battingAverageDeterminer.nextDouble(0.300, 0.500);
             Player player = new Player(battingAverage, 0, this);
-            this.lineUp.add(player);
+            this.hittingRoster.add(player);
         }
 
         // Construct pitching roster.
@@ -35,14 +36,27 @@ public class Team {
         Collections.sort(pitchingRoster);
     }
 
+    public List<CurrentBatter> constructCurrentLineUpFromHittingRoster(CurrentTeam currentTeam) {
+        List<CurrentBatter> lineUp = new ArrayList<>();
+        for (Player player : this.hittingRoster) {
+            lineUp.add(new CurrentBatter(player, player.getBattingAverage(), currentTeam));
+        }
+        return lineUp;
+    }
 
-
+    public List<CurrentPitcher> constructCurrentPitchingRoster(CurrentTeam currentTeam) {
+        List<CurrentPitcher> pitchingRoster = new ArrayList<>();
+        for (Player player : this.pitchingRoster) {
+            pitchingRoster.add(new CurrentPitcher(player, 0));
+        }
+        return pitchingRoster;
+    }
     public Player getFirstPitcher() {
         return pitchingRoster.get(0);
     }
 
     public Player getFirstBatter() {
-        return lineUp.get(0);
+        return hittingRoster.get(0);
     }
 
 

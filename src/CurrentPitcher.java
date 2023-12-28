@@ -13,10 +13,11 @@ public class CurrentPitcher {
 
     // Returns true for strikes, false for balls.
     public boolean throwPitch() {
-        Random strikeOrBallChance = new Random();
-        int strikeOrBall = strikeOrBallChance.nextInt(3); // 1 to 2
-
-        return strikeOrBall != 1;
+//        Random strikeOrBallChance = new Random();
+//        int strikeOrBall = strikeOrBallChance.nextInt(3); // 1 to 2
+//
+//        return strikeOrBall != 1;
+        return false;
     }
 
 

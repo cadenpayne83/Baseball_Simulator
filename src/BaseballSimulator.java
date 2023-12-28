@@ -3,7 +3,7 @@ public class BaseballSimulator {
     public static GameState gameState;
 
     // Starts a game in inning 1.
-    public static void simulateGame(Team homeTeam, Team awayTeam) {
+    public static void simulateGame(CurrentTeam homeTeam, CurrentTeam awayTeam) {
         gameState = new GameState(1, 0, homeTeam, awayTeam, null, null);
 
         while (gameState.isPlaying()) {
@@ -12,6 +12,7 @@ public class BaseballSimulator {
     }
 
     public static void simulateInning() {
+        int i = 0;
         int inning = gameState.getInning();
         boolean isTopOfInning = gameState.getIsTopOfInning();
         if (isTopOfInning) {
@@ -33,7 +34,12 @@ public class BaseballSimulator {
 
         System.out.println();
         while (gameState.getOuts() < 3) {
+            gameState.getBasePath().announceRunners();
             simulateAtBat();
+            i += 1;
+            if (i == 20) {
+                break;
+            }
         }
         System.out.println("The inning has ended!");
         System.out.println();
@@ -53,16 +59,19 @@ public class BaseballSimulator {
 
             // At this point, batter only swings at strikes
             if (isStrike) {
-                // For now, it will always be a hit, never a swing or miss.
                 Hit hit = currentBatter.swing();
                 int bases = hit.getBases();
                 if (bases > 0 && bases < 4) {
                     currentBatter.putOnBase(hit.getBases());
+                    return;
                 } else if (bases == 4) {
                     CurrentTeam battersTeam = currentBatter.getAssociatedCurrentTeam();
 
                     // change to account for runners on base
-                    gameState.incrementScore(1);
+                    BasePath basePath = gameState.getBasePath();
+                    int numberOfRunnersOnBase = basePath.numberOfRunnersOnBase();
+
+                    gameState.incrementScore(1 + numberOfRunnersOnBase);
                     System.out.println("Home run! Score is " + gameState.getHomeTeamRuns() + " to " + gameState.getAwayTeamRuns());
                     // next batter now
                     System.out.println();
@@ -82,7 +91,7 @@ public class BaseballSimulator {
             System.out.println("Strike three, you're out!");
             gameState.advanceOuts();
         } else if (balls == 4) {
-            System.out.println("Ball four, take your base!");
+            currentBatter.walk();
         }
         System.out.println();
     }

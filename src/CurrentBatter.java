@@ -16,9 +16,9 @@ public class CurrentBatter {
         Random chanceOfHit = new Random();
         double hitChance = chanceOfHit.nextDouble(101);
         double battingAverageAsPercent = this.battingAverage * 100;
-        if (0 < battingAverageAsPercent) {
+        if (hitChance < battingAverageAsPercent) {
             // Calculate hit
-            int totalBases = chanceOfHit.nextInt(1, 5);
+            int totalBases = chanceOfHit.nextInt(1, 4);
             return new Hit(totalBases);
         }
         return new Hit(0);
@@ -27,7 +27,14 @@ public class CurrentBatter {
     // Can call putOnBase on a current batter, but needs to call
     // a putOnBase method in GameState to actually alter the base path.
     public void putOnBase(int baseNumber) {
-        BaseballSimulator.gameState.putOnBase(baseNumber, this.player);
+        if (baseNumber == 1) {
+            BaseballSimulator.gameState.single(this);
+        } else if (baseNumber == 2) {
+            BaseballSimulator.gameState.double_(this);
+        } else if (baseNumber == 3) {
+            BaseballSimulator.gameState.triple(this);
+        }
+        System.out.println();
     }
 
     public Player getAssociatedPlayer() {
@@ -36,5 +43,9 @@ public class CurrentBatter {
 
     public CurrentTeam getAssociatedCurrentTeam() {
         return this.associatedCurrentTeam;
+    }
+
+    public void walk() {
+        BaseballSimulator.gameState.walk(this);
     }
 }

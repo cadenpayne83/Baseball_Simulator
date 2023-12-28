@@ -10,6 +10,8 @@ public class SimulateGameTest {
     public void simulateGame() {
         Team homeTeam = new Team("Home Team");
         Team awayTeam = new Team("Away Team");
-        BaseballSimulator.simulateGame(homeTeam, awayTeam);
+        CurrentTeam currentHomeTeam = new CurrentTeam(homeTeam);
+        CurrentTeam currentAwayTeam = new CurrentTeam(awayTeam);
+        BaseballSimulator.simulateGame(currentHomeTeam, currentAwayTeam);
     }
 }

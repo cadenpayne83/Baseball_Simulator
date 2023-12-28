@@ -5,16 +5,16 @@ public class GameState {
 
     private boolean topOfInning;
     private int outs;
-    private Player currentPitcher;
-    private Player currentBatter;
-    private Team homeTeam;
+    private CurrentPitcher currentPitcher;
+    private CurrentBatter currentBatter;
+    private CurrentTeam homeTeam;
     private int homeTeamRuns;
-    private Team awayTeam;
+    private CurrentTeam awayTeam;
     private int awayTeamRuns;
     private boolean isPlaying;
     private BasePath basePath;
 
-    public GameState(int inning, int outs, Team homeTeam, Team awayTeam, Player currentPitcher, Player currentBatter) {
+    public GameState(int inning, int outs, CurrentTeam homeTeam, CurrentTeam awayTeam, CurrentPitcher currentPitcher, CurrentBatter currentBatter) {
         this.inning = inning;
         this.outs = 0;
         this.homeTeam = homeTeam;
@@ -25,8 +25,8 @@ public class GameState {
         this.topOfInning = true;
 
         // Construct teams in order to grab players.
-        this.homeTeam.constructTeam();
-        this.awayTeam.constructTeam();
+        this.homeTeam.constructLineUp();
+        this.awayTeam.constructLineUp();
 
         // Grab current pitcher and current batter. When
         // a baseball game starts, the visiting team bats first,
@@ -35,7 +35,7 @@ public class GameState {
         this.currentBatter = awayTeam.getFirstBatter();
 
         // Construct base path
-        this.basePath = new BasePath();
+        this.basePath = new BasePath(this);
     }
 
     public int getInning() {
@@ -63,33 +63,35 @@ public class GameState {
 
     public void advanceOuts() {
         this.outs += 1;
+        if (this.outs == 1) {
+            System.out.println("1 out!");
+        } else {
+            System.out.println(outs + " outs!");
+        }
     }
 
-    public Team getHomeTeam() {
+    public CurrentTeam getHomeTeam() {
         return homeTeam;
     }
 
-    public Team getAwayTeam() {
+    public CurrentTeam getAwayTeam() {
         return awayTeam;
     }
 
     // Returns the current player as an instance of a CurrentPlayer.
     public CurrentPitcher getCurrentPitcher() {
-        Player pitcher = currentPitcher;
-        return new CurrentPitcher(pitcher, 0);
+        return currentPitcher;
     }
 
-    public void setCurrentPitcher(Player currentPitcher) {
+    public void setCurrentPitcher(CurrentPitcher currentPitcher) {
         this.currentPitcher = currentPitcher;
     }
 
     public CurrentBatter getCurrentBatter() {
-        Player batter = currentBatter;
-        CurrentTeam associatedCurrentTeam = new CurrentTeam(batter.getTeam());
-        return new CurrentBatter(batter, batter.getBattingAverage(), associatedCurrentTeam);
+        return currentBatter;
     }
 
-    public void setCurrentBatter(Player currentBatter) {
+    public void setCurrentBatter(CurrentBatter currentBatter) {
         this.currentBatter = currentBatter;
     }
 
@@ -104,17 +106,35 @@ public class GameState {
         this.outs = 0;
     }
 
-    public void putOnBase(int baseNumber, Player player) {
-        if (baseNumber == 1) {
-            basePath.firstBase.addPlayer(player);
-        } else if (baseNumber == 2) {
-            basePath.secondBase.addPlayer(player);
-        } else if (baseNumber == 3) {
-            basePath.thirdBase.addPlayer(player);
-        }
+    public void walk(CurrentBatter batter) {
+        basePath.walk(batter);
     }
+
+    public void single(CurrentBatter batter) {
+        basePath.single(batter);
+    }
+
+    public void double_(CurrentBatter batter) {
+        basePath.double_(batter);
+    }
+
+    public void triple(CurrentBatter batter) {
+        basePath.triple(batter);
+    }
+
+    public void homeRun() {
+        basePath.homeRun();
+    }
+
     public void incrementScore(int increment) {
-        this.homeTeamRuns += increment;
+        if (this.getIsTopOfInning()) {
+            this.awayTeamRuns += increment;
+        } else {
+            this.homeTeamRuns += increment;
+        }
+
+        System.out.println("Score is away team " + awayTeamRuns + ", home team " + homeTeamRuns + ".");
+
     }
 
     public int getHomeTeamRuns() {
@@ -125,18 +145,11 @@ public class GameState {
         return this.awayTeamRuns;
     }
 
-    private BasePath getBasePath() {
+    public BasePath getBasePath() {
         return this.basePath;
     }
-    public void walkBatter() {
-        LinkedList<BasePath.Base> basePath = getBasePath().getBasePathLinkedList();
-        for (int i = 0; i < 3; i++) {
-            BasePath.Base base = basePath.get(i);
-            if (base.isOccupied()) {
-//                for
-            }
-        }
+
+    public int numberOfRunnersOnBase() {
+        return this.basePath.getBasePathLinkedList().size();//doesn't work, always 3
     }
-
-
 }
