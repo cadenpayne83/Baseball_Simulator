@@ -14,6 +14,8 @@ public class GameState {
     private boolean isPlaying;
     private BasePath basePath;
 
+    public int i = 0;
+
     public GameState(int inning, int outs, CurrentTeam homeTeam, CurrentTeam awayTeam, CurrentPitcher currentPitcher, CurrentBatter currentBatter) {
         this.inning = inning;
         this.outs = 0;
@@ -47,8 +49,14 @@ public class GameState {
     }
 
     public void advanceInning() {
-        if (this.inning == 9 && !this.topOfInning) {
-            this.isPlaying = false;
+        if (inning >= 9 && !topOfInning) {
+            // if the score is tied, keep playing
+            if (homeTeamRuns == awayTeamRuns) {
+                topOfInning = !topOfInning;
+                inning += 1;
+            } else {
+                this.isPlaying = false;
+            }
         } else if (this.getIsTopOfInning()){
             topOfInning = !topOfInning;
         } else {
@@ -122,8 +130,8 @@ public class GameState {
         basePath.triple(batter);
     }
 
-    public void homeRun() {
-        basePath.homeRun();
+    public void homeRun(CurrentBatter batter) {
+        basePath.homeRun(batter);
     }
 
     public void incrementScore(int increment) {
@@ -131,6 +139,10 @@ public class GameState {
             this.awayTeamRuns += increment;
         } else {
             this.homeTeamRuns += increment;
+        }
+
+        if ((inning >= 9) && (!topOfInning) && (homeTeamRuns > awayTeamRuns)) {
+            System.out.println("Walk off! Home team wins!");
         }
 
         System.out.println("Score is away team " + awayTeamRuns + ", home team " + homeTeamRuns + ".");
@@ -151,5 +163,9 @@ public class GameState {
 
     public int numberOfRunnersOnBase() {
         return this.basePath.getBasePathLinkedList().size();//doesn't work, always 3
+    }
+
+    public void resetRunners() {
+        this.basePath.resetRunners();
     }
 }

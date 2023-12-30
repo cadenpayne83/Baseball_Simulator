@@ -170,8 +170,13 @@ public class BasePath {
         thirdBase.addPlayer(batter);
     }
 
-    public void homeRun(){
-
+    public void homeRun(CurrentBatter batter){
+        System.out.println("Home Run!");
+        int runnersOnBase = this.numberOfRunnersOnBase();
+        gameState.incrementScore(runnersOnBase + 1); // + 1 for current batter
+        for (Base base : basePath) {
+            base.removePlayer();
+        }
     }
 
     public void announceRunners() {
@@ -198,4 +203,11 @@ public class BasePath {
         }
         System.out.println();
     }
+
+    public void resetRunners() {
+        for (Base base : basePath) {
+            base.removePlayer();
+        }
+    }
+
 }

@@ -1,3 +1,5 @@
+import java.util.Random;
+
 public class BaseballSimulator {
 
     public static GameState gameState;
@@ -9,10 +11,12 @@ public class BaseballSimulator {
         while (gameState.isPlaying()) {
             simulateInning();
         }
+
+        System.out.println("Game Over! Final score is home team " + gameState.getHomeTeamRuns() +
+                ", away team " + gameState.getAwayTeamRuns());
     }
 
     public static void simulateInning() {
-        int i = 0;
         int inning = gameState.getInning();
         boolean isTopOfInning = gameState.getIsTopOfInning();
         if (isTopOfInning) {
@@ -36,15 +40,12 @@ public class BaseballSimulator {
         while (gameState.getOuts() < 3) {
             gameState.getBasePath().announceRunners();
             simulateAtBat();
-            i += 1;
-            if (i == 20) {
-                break;
-            }
         }
         System.out.println("The inning has ended!");
         System.out.println();
         gameState.advanceInning();
         gameState.resetOuts();
+        gameState.resetRunners();
     }
 
     public static void simulateAtBat() {
@@ -56,35 +57,42 @@ public class BaseballSimulator {
         int balls = 0;
         while ((strikes < 3) && (balls < 4)) {
             boolean isStrike = currentPitcher.throwPitch();
+            // Can't find stat, but I'm assuming mlb batters swing at about
+            // half of pitches in the strike zone.
+            Random chanceToSwingAtBall = new Random();
+            int chance = chanceToSwingAtBall.nextInt(2); // 0 or 1
+            Hit hit;
 
-            // At this point, batter only swings at strikes
+            // At this point, batter will not swing at balls.
             if (isStrike) {
-                Hit hit = currentBatter.swing();
-                int bases = hit.getBases();
-                if (bases > 0 && bases < 4) {
-                    currentBatter.putOnBase(hit.getBases());
-                    return;
-                } else if (bases == 4) {
-                    CurrentTeam battersTeam = currentBatter.getAssociatedCurrentTeam();
 
-                    // change to account for runners on base
-                    BasePath basePath = gameState.getBasePath();
-                    int numberOfRunnersOnBase = basePath.numberOfRunnersOnBase();
+                if (chance == 1) { // this executes if the batter attempted a swing.
 
-                    gameState.incrementScore(1 + numberOfRunnersOnBase);
-                    System.out.println("Home run! Score is " + gameState.getHomeTeamRuns() + " to " + gameState.getAwayTeamRuns());
-                    // next batter now
-                    System.out.println();
-                    return;
+                    hit = currentBatter.swing();
+                    int bases = hit.getBases();
+
+                    if (bases == -1) { // If hit is -1, it's a swing and a miss.
+                        strikes += 1;
+                        System.out.println("Swing and a miss! strike " + strikes);
+                    } else if (bases == 0) { // If hit is 0, ball was caught in play
+                        gameState.advanceOuts();
+                        return;
+                    } else if (bases > 0 && bases < 4) {
+                        currentBatter.putOnBase(hit.getBases());
+                        return;
+                    } else if (bases == 4) {
+                        currentBatter.putOnBase(hit.getBases());
+                        return;
+
+                    }
+                } else { // this executes if batter did not attempt a swing
+                    strikes += 1;
+                    System.out.println("Strike looking! Strike " + strikes + "!");
                 }
-                strikes += 1;
-                System.out.println("Strike " + strikes + "!");
-            } else {
+            } else if (!isStrike) {
                 balls += 1;
-                System.out.println("Ball " + balls + ".");
+                System.out.println("Ball! Ball " + balls);
             }
-
-            pitchesThrownThisAtBat += 1;
         }
 
         if (strikes == 3) {
@@ -95,4 +103,6 @@ public class BaseballSimulator {
         }
         System.out.println();
     }
+
+
 }
